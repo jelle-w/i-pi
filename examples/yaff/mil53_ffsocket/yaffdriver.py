@@ -44,7 +44,7 @@ class MySocket(object):
         return data
 
     def await_data(self, size):
-        data = ''
+        data = b''
         while len(data) < size:
             stub = self.s.recv(size - len(data))
             data += stub
@@ -54,7 +54,7 @@ class MySocket(object):
 
     def send_header(self, header):
         assert len(header) <= 12
-        header = header.ljust(12, ' ')
+        header = header.ljust(12, b' ')
         if self.verbose:
             print('SEND', (header,))
         with log.section('DRIVER'):
@@ -108,12 +108,12 @@ class YAFFDriver(object):
 
     def send_forces(self):
         self.s.send_header(Message("forceready"))
-        self.s.send_data(np.array([self.e]))
+        self.s.send_data(np.array([self.e]).tobytes())
         self.s.send_data(np.array([self.natom]))
         self.s.send_data(self.gpos.ravel())
         self.s.send_data(self.vtens.ravel())
         self.s.send_data(np.array([np.int32(9)]))
-        self.s.send_data("YAFF Done")
+        self.s.send_data(b"YAFF Done")
         self.hasdata = False
 
     def run(self):
